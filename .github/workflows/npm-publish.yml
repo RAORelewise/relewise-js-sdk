@@ -4,8 +4,12 @@
 name: Node.js Package
 
 on:
-  release:
-    types: [created]
+  pull_request:
+    # Sequence of patterns matched against refs/heads
+    branches:    
+      - main
+      - 'mona/octocat'
+      - 'releases/**'
 
 jobs:
   build:
@@ -15,10 +19,29 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - run: npm ci
-      - run: npm test
+      - name: Build and extract typescript interfaces
+        working-directory: ./lib
+        run: |
+           npm ci
+           npm npm run gen-api
+           npm build
+           npm build:types
+           
+  version:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+          with:
+            token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+        - name: Publish package to NPM
+          working-directory: ./lib
+          run: |
+            git config --global user.name 'RAORelewise'
+            git config --global user.email 'rao@relewise.com'
+            npm version patch -m "[RELEASE] %s"
+            git push
 
-  publish-npm:
+  publish:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -27,7 +50,10 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish
+      - name: Publish package to NPM
+        working-directory: ./lib
+        run: |
+           npm ci
+           npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
