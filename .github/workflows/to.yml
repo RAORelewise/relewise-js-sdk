@@ -29,10 +29,11 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
+          scope: '@raorelewise'
       - name: Publish package to NPM
         working-directory: ./lib
         run: |
            npm ci
-           npm publish
+           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
