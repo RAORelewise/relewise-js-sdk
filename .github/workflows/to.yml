@@ -15,9 +15,9 @@ jobs:
         working-directory: ./lib
         run: |
            npm ci
-           npm npm run gen-api
-           npm build
-           npm build:types
+           npm run gen-api
+           npm run build
+           npm run build:types
            
   publish:
     if: github.event.action == 'TEST'
