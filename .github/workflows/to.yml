@@ -29,7 +29,7 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-          scope: '@raorelewise'
+          scope: '@rao_relewise'
       - name: Publish package to NPM
         working-directory: ./lib
         run: |
