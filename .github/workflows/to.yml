@@ -29,12 +29,14 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
+          scope: 'rao_relewise'
       - name: Authenticate with GitHub package registry
         working-directory: ./lib
         run:
           echo "//npm.pkg.github.com:_authToken=${{ secrets.NPM_TOKEN }}" >
           ~/.npmrc
       - name: Publish package to NPM
+        working-directory: ./lib
         run: |
            npm ci
            npm publish --access public
