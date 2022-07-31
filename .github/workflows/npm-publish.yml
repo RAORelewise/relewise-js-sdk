@@ -4,12 +4,12 @@
 name: Node.js Package
 
 on:
-  pull_request:
-    # Sequence of patterns matched against refs/heads
-    branches:    
-      - main
-      - 'mona/octocat'
-      - 'releases/**'
+  workflow_dispatch:
+    inputs:
+      source:
+        description: 'Source of event'
+        required: false
+        default: 'No source specified'
 
 jobs:
   build:
@@ -27,20 +27,6 @@ jobs:
            npm build
            npm build:types
            
-  version:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
-          with:
-            token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
-        - name: Publish package to NPM
-          working-directory: ./lib
-          run: |
-            git config --global user.name 'RAORelewise'
-            git config --global user.email 'rao@relewise.com'
-            npm version patch -m "[RELEASE] %s"
-            git push
-
   publish:
     needs: build
     runs-on: ubuntu-latest
