@@ -1,4 +1,4 @@
-name: dispatch receiver
+name: Version and publish
 
 on:
   workflow_dispatch:
@@ -19,6 +19,7 @@ jobs:
         run: |
           git config --global user.name 'RAORelewise'
           git config --global user.email 'rao@relewise.com'
-          npm version patch -m "[RELEASE] %s"
+          npm version patch
           git add package.json
+          git commit -m 'bump version'
           git push
