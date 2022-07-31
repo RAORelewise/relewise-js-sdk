@@ -1,21 +1,24 @@
-name: Manually triggered workflow
+name: dispatch receiver
 
 on:
   workflow_dispatch:
     inputs:
-      name:
-        description: 'Person to greet'
+      version:
+        description: 'New package version'
         required: true
-        default: 'Mona the Octocat'
-      home:
-        description: 'location'
-        required: false
-        default: 'The Octoverse'
 
 jobs:
-  say_hello:
+  version:
     runs-on: ubuntu-latest
     steps:
-    - run: |
-        echo "Hello ${{ github.event.inputs.name }}"
-        echo "- in ${{ github.event.inputs.home }}"
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+      - name: Bump version
+        working-directory: ./lib
+        run: |
+          git config --global user.name 'RAORelewise'
+          git config --global user.email 'rao@relewise.com'
+          npm version patch -m "[RELEASE] %s"
+          git add package.json
+          git push
