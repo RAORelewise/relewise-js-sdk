@@ -3,37 +3,16 @@ name: dispatch receiver
 on: [repository_dispatch]
 
 jobs:
-  build:
-    if: github.event.action == 'TEST'
+  version:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v2
         with:
-          node-version: 16
-      - name: Build and extract typescript interfaces
+          token: ${{ secrets.GH_TOKEN }}
+      - name: Bump version
         working-directory: ./lib
         run: |
-           npm ci
-           npm run gen-api
-           npm run build
-           npm run build:types
-           
-  publish:
-    if: github.event.action == 'TEST'
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          registry-url: https://registry.npmjs.org/
-          scope: '@rao_relewise'
-      - name: Publish package to NPM
-        working-directory: ./lib
-        run: |
-           npm ci
-           npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          git config --global user.name 'RAORelewise'
+          git config --global user.email 'rao@relewise.com'
+          npm version patch -m "[RELEASE] %s"
+          git push
