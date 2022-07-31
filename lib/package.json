@@ -1,5 +1,5 @@
 {
-  "name": "rao-test-js-client",
+  "name": "@raorelewise/rao-test-js-client",
   "version": "0.0.1",
   "description": "Relewise recommendation engine JS/TS client API https://relewise.com",
   "author": "Rasmus Østergaard",
