@@ -29,7 +29,7 @@ jobs:
            npm run build
            npm run build:types
            
-  version:
+  publish:
     needs: build
     runs-on: ubuntu-latest
     defaults:
@@ -47,14 +47,7 @@ jobs:
           git add package.json
           git commit -m 'bump version'
           git push
-            
-  publish:
-    needs: version
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./lib
-    steps:
+
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
