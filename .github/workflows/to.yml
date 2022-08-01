@@ -53,7 +53,7 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-          scope: '@rao_relewise'
+          scope: '@rao_relewise_worker'
       - name: Publish package to NPM
         run: |
            npm ci
