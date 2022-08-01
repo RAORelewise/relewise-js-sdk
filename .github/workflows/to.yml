@@ -1,21 +1,40 @@
-name: Version and publish
+name: Version and NPM publish
 
 on:
   workflow_dispatch:
     inputs:
       version:
         description: 'New package version'
-        required: true
+        required: false
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lib
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Build and extract typescript interfaces
+        run: |
+           npm ci
+           npm run gen-api
+           npm run build
+           npm run build:types
+           
   version:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lib
     steps:
       - uses: actions/checkout@v2
         with:
           token: ${{ secrets.GH_TOKEN }}
       - name: Bump version
-        working-directory: ./lib
         run: |
           git config --global user.name 'RAORelewise'
           git config --global user.email 'rao@relewise.com'
@@ -23,3 +42,23 @@ jobs:
           git add package.json
           git commit -m 'bump version'
           git push
+            
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lib
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+          scope: '@rao_relewise'
+      - name: Publish package to NPM
+        run: |
+           npm ci
+           npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
