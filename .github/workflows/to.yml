@@ -50,6 +50,6 @@ jobs:
       - name: Publish package to NPM
         run: |
            npm ci
-           npm publish --access public
+           npm publish --access public --registry https://registry.npmjs.com/
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
