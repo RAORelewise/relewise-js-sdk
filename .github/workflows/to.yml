@@ -3,7 +3,7 @@ name: Version and Release
 on:
   workflow_dispatch:
     inputs:
-      newversion:
+      version:
         description: 'Semantic Version Bump Type (major minor patch)'
         required: false
         default: 'patch'
@@ -39,7 +39,7 @@ jobs:
       with:
         git_email: bcomnes@gmail.com
         git_username: ${{ github.actor }}
-        newversion: ${{ github.event.inputs.newversion }}
+        newversion: ${{ github.event.inputs.version }}
         push_version_commit: true # if your prePublishOnly step pushes git commits, you can omit this input or set it to false.
         github_token: ${{ secrets.GH_TOKEN }} # built in actions token.  Passed tp gh-release if in use.
         npm_token: ${{ secrets.NPM_TOKEN }} # user set secret token generated at npm
