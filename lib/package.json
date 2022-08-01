@@ -1,6 +1,6 @@
 {
-  "name": "@rao_relewise/rao-test-js-client",
-  "version": "0.0.9",
+  "name": "@rao.relewise/rao-test-js-client",
+  "version": "0.0.10",
   "description": "Relewise recommendation engine JS/TS client API https://relewise.com",
   "author": "Rasmus Østergaard",
   "license": "ISC",
