@@ -1,62 +1,47 @@
-name: Version and NPM publish
+name: Version and Release
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'New package version'
+        description: 'Semantic Version Bump Type (major minor patch)'
         required: false
+        default: 'patch'
 
+env:
+  node_version: '16'
+  
 concurrency: # prevent concurrent releases
   group: npm-bump
   cancel-in-progress: true
 
 jobs:
-  build:
+  version_and_release:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./lib
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - name: Build and extract typescript interfaces
+    - uses: actions/checkout@v3
+      with:
+        # fetch full history so things like auto-changelog work properly
+        fetch-depth: 0
+        
+    - name: Use Node.js ${{ env.node_version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.node_version }}
+        # setting a registry enables the NODE_AUTH_TOKEN env variable where we can set an npm token.  REQUIRED
+        registry-url: 'https://registry.npmjs.org'
         run: |
            npm ci
            npm run gen-api
            npm run build
            npm run build:types
            
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./lib
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          token: ${{ secrets.GH_TOKEN }}
-      - name: Bump version
-        run: |
-          git config --global user.name 'RAORelewise'
-          git config --global user.email 'rao@relewise.com'
-          npm version patch
-          git add package.json
-          git commit -m 'bump version'
-          git push
-
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          registry-url: https://registry.npmjs.org/
-          scope: '@rao.relewise'
-      - name: Publish package to NPM
-        run: |
-           npm ci
-           npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+    - name: Version and publish to npm
+      uses: bcomnes/npm-bump@v2.0.2
+      with:
+        git_email: rao@relewise.com
+        git_username: ${{ github.actor }}
+        newversion: ${{ github.event.inputs.version }}
+        push_version_commit: true # if your prePublishOnly step pushes git commits, you can omit this input or set it to false.
+        github_token: ${{ secrets.GH_TOKEN }} # built in actions token.  Passed tp gh-release if in use.
+        npm_token: ${{ secrets.NPM_TOKEN }} # user set secret token generated at npm
